@@ -20,7 +20,20 @@ tracing-subscriber = "0.3"
 youtube_dl = "0.9"
 async-trait = "0.1"
 
+# Profil de compilation optimisé pour réduire la consommation mémoire
+# tout en gardant de bonnes performances
 [profile.release]
-opt-level = 3
-lto = true
-codegen-units = 1
+opt-level = 2           # Niveau d'optimisation 2 au lieu de 3 (réduit la RAM)
+lto = "thin"            # LTO léger au lieu de "fat" (beaucoup moins de RAM)
+codegen-units = 16      # Compilation parallèle (réduit drastiquement la RAM par thread)
+incremental = false     # Désactive la compilation incrémentale en release
+strip = true            # Supprime les symboles de debug du binaire final
+
+# Profil alternatif pour compilation ultra-rapide avec RAM minimale
+# Utiliser avec: cargo build --profile fast
+[profile.fast]
+inherits = "release"
+opt-level = 1           # Optimisation minimale
+lto = false             # Pas de LTO du tout
+codegen-units = 256     # Maximum de parallélisation
+

@@ -1,0 +1,18 @@
+# Configuration Cargo pour optimiser la compilation
+# Ce fichier réduit la consommation mémoire pendant la compilation
+
+[build]
+# Utilise moins de jobs en parallèle pour réduire la RAM
+# Ajustez selon votre système (1-4 pour systèmes avec peu de RAM)
+jobs = 4
+
+[profile.release]
+# Ces paramètres sont combinés avec ceux de Cargo.toml
+# Ils réduisent la consommation mémoire pendant la compilation
+debug = false           # Pas d'informations de debug
+split-debuginfo = "off" # Désactive la génération de fichiers de debug séparés
+
+[net]
+# Accélère le téléchargement des dépendances
+git-fetch-with-cli = true
+
