@@ -26,7 +26,7 @@ Ce guide vous explique comment installer et configurer le bot Discord Music **Ru
 Après l'import, vous pouvez modifier:
 - Le nom de l'egg
 - La description
-- L'image Docker (par défaut: `ghcr.io/parkervcp/yolks:rust_1.90`)
+- L'image Docker (par défaut: `ghcr.io/parkervcp/yolks:debian`)
 - Les variables d'environnement
 
 ### Étape 3: Créer un serveur
@@ -38,7 +38,7 @@ Après l'import, vous pouvez modifier:
    - **Owner**: Sélectionnez l'utilisateur
    - **Nest**: Sélectionnez le nest où vous avez importé l'egg
    - **Egg**: Discord Music Bot (Rust)
-   - **Docker Image**: `ghcr.io/parkervcp/yolks:rust_1.90`
+   - **Docker Image**: `ghcr.io/parkervcp/yolks:debian`
 
 4. **Allocation**:
    - Assignez une IP et un port (pas utilisé par le bot, mais requis par Pterodactyl)
@@ -194,9 +194,10 @@ Les logs s'affichent en temps réel dans la **Console**
 ### Changer l'image Docker
 
 **Images disponibles:**
-- `ghcr.io/parkervcp/yolks:rust_1.90` (recommandé)
-- `ghcr.io/parkervcp/yolks:rust_1.89`
-- `ghcr.io/parkervcp/yolks:rust_latest`
+- `ghcr.io/parkervcp/yolks:debian` (recommandé)
+- `ghcr.io/parkervcp/yolks:ubuntu`
+
+**Note:** Rust est installé automatiquement lors de l'installation
 
 **Pour changer:**
 1. Arrêtez le serveur
