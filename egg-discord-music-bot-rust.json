@@ -4,7 +4,7 @@
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2025-10-18T00:00:00+00:00",
+    "exported_at": "2025-10-19T00:00:00+00:00",
     "name": "Discord Music Bot (Rust)",
     "author": "discord@bot.com",
     "description": "Un bot Discord haute performance écrit en Rust pour lire de la musique YouTube dans les salons vocaux avec interface interactive.",
@@ -15,7 +15,7 @@
         "ghcr.io/parkervcp/yolks:debian": "ghcr.io/parkervcp/yolks:debian"
     },
     "file_denylist": [],
-    "startup": "source $HOME/.cargo/env 2>/dev/null || true; if [[ -d .git ]] && [[ {{AUTO_UPDATE}} == \"1\" ]]; then git pull && cargo build --release; fi; if [[ ! -f /usr/local/bin/ffmpeg ]]; then echo \"Installation de FFmpeg...\"; apt update && apt install -y ffmpeg yt-dlp; fi; ./target/release/discord-music-bot",
+    "startup": "#!/bin/bash\n# Charger Rust dans l'environnement\nexport PATH=\"$HOME/.cargo/bin:$PATH\"\nsource $HOME/.cargo/env 2>/dev/null || true\n\n# Mise à jour automatique si activée\nif [[ -d .git ]] && [[ {{AUTO_UPDATE}} == \"1\" ]]; then\n    echo \"Mise à jour depuis GitHub...\"\n    git pull\n    echo \"Recompilation du projet...\"\n    cargo build --release\nfi\n\n# Vérifier et installer FFmpeg si nécessaire\nif ! command -v ffmpeg &> /dev/null; then\n    echo \"Installation de FFmpeg et yt-dlp...\"\n    apt update && apt install -y ffmpeg yt-dlp\nfi\n\n# Lancer le bot\nif [[ -f ./target/release/discord-music-bot ]]; then\n    ./target/release/discord-music-bot\nelse\n    echo \"ERREUR: Le binaire n'existe pas. Veuillez réinstaller le serveur.\"\n    exit 1\nfi",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"est connect\\u00e9 et pr\\u00eat\"\r\n}",
@@ -24,15 +24,15 @@
     },
     "scripts": {
         "installation": {
-            "script": "#!\/bin\/bash\r\n# Discord Music Bot Rust Installation Script\r\n\r\necho -e \"Installation de Rust et des d\u00e9pendances...\"\r\napt update\r\napt install -y git curl wget ffmpeg yt-dlp pkg-config libssl-dev build-essential\r\n\r\n# Installer Rust\r\nif ! command -v cargo &> \/dev\/null; then\r\n    echo -e \"Installation de Rust...\"\r\n    curl --proto '=https' --tlsv1.2 -sSf https:\/\/sh.rustup.rs | sh -s -- -y\r\n    source \"$HOME\/.cargo\/env\"\r\nfi\r\n\r\ncd \/mnt\/server\r\n\r\nif [ \"${USER_UPLOAD}\" == \"true\" ] || [ \"${USER_UPLOAD}\" == \"1\" ]; then\r\n    echo -e \"Assuming user uploaded files...\"\r\n    if [ ! -f Cargo.toml ]; then\r\n        echo -e \"Cargo.toml not found, cloning from GitHub...\"\r\n        MODIFIED_GIT_REPO=$(echo ${GIT_ADDRESS} | sed 's\/https:\\\/\\\/\/\/g' | sed 's\/http:\\\/\\\/\/\/g')\r\n        if [ -z \"${USERNAME}\" ] && [ -z \"${ACCESS_TOKEN}\" ]; then\r\n            echo -e \"Cloning without credentials\"\r\n            git clone https:\/\/${MODIFIED_GIT_REPO} .\r\n        else\r\n            echo -e \"Cloning with credentials\"\r\n            git clone https:\/\/${USERNAME}:${ACCESS_TOKEN}@${MODIFIED_GIT_REPO} .\r\n        fi\r\n    fi\r\nelse\r\n    echo -e \"Cloning from GitHub repository...\"\r\n    MODIFIED_GIT_REPO=$(echo ${GIT_ADDRESS} | sed 's\/https:\\\/\\\/\/\/g' | sed 's\/http:\\\/\\\/\/\/g')\r\n    if [ -z \"${USERNAME}\" ] && [ -z \"${ACCESS_TOKEN}\" ]; then\r\n        echo -e \"Cloning without credentials\"\r\n        git clone https:\/\/${MODIFIED_GIT_REPO} .\r\n    else\r\n        echo -e \"Cloning with credentials\"\r\n        git clone https:\/\/${USERNAME}:${ACCESS_TOKEN}@${MODIFIED_GIT_REPO} .\r\n    fi\r\nfi\r\n\r\nif [ -f Cargo.toml ]; then\r\n    echo -e \"Compiling Rust project...\"\r\n    cargo build --release\r\n    echo -e \"Compilation completed successfully!\"\r\nelse\r\n    echo -e \"Cargo.toml not found, skipping compilation\"\r\nfi\r\n\r\necho -e \"Installation complete!\"\r\necho -e \"Don't forget to set your DISCORD_BOT_TOKEN in the Startup tab!\"",
-            "container": "ghcr.io\/parkervcp\/installers:debian",
+            "script": "#!/bin/bash\n# Discord Music Bot Rust - Script d'installation amélioré\n\nset -e  # Arrêter en cas d'erreur\n\necho \"═══════════════════════════════════════════════════════════\"\necho \"  Installation Discord Music Bot (Rust)\"\necho \"═══════════════════════════════════════════════════════════\"\n\n# Mise à jour et installation des dépendances système\necho \"\"\necho \"[1/5] Installation des dépendances système...\"\napt update -qq\napt install -y -qq git curl wget ffmpeg yt-dlp pkg-config libssl-dev build-essential ca-certificates\n\necho \"✓ Dépendances système installées\"\n\n# Installation de Rust\necho \"\"\necho \"[2/5] Installation de Rust...\"\nif ! command -v cargo &> /dev/null; then\n    echo \"Installation de Rust via rustup...\"\n    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable\n    export PATH=\"$HOME/.cargo/bin:$PATH\"\n    source \"$HOME/.cargo/env\"\n    echo \"✓ Rust installé avec succès\"\nelse\n    echo \"✓ Rust déjà installé\"\n    export PATH=\"$HOME/.cargo/bin:$PATH\"\n    source \"$HOME/.cargo/env\" 2>/dev/null || true\nfi\n\n# Vérifier l'installation de Rust\nif ! command -v cargo &> /dev/null; then\n    echo \"✗ ERREUR: Cargo n'est pas disponible après installation\"\n    echo \"Tentative de chargement manuel...\"\n    export PATH=\"$HOME/.cargo/bin:$PATH\"\n    source \"$HOME/.cargo/env\"\nfi\n\necho \"Version Rust: $(rustc --version)\"\necho \"Version Cargo: $(cargo --version)\"\n\n# Cloner ou utiliser les fichiers existants\ncd /mnt/server\n\necho \"\"\necho \"[3/5] Récupération du code source...\"\n\nif [ \"${USER_UPLOAD}\" == \"true\" ] || [ \"${USER_UPLOAD}\" == \"1\" ]; then\n    echo \"Mode: Fichiers uploadés par l'utilisateur\"\n    if [ ! -f Cargo.toml ]; then\n        echo \"⚠ Cargo.toml introuvable, clonage depuis GitHub...\"\n        MODIFIED_GIT_REPO=$(echo ${GIT_ADDRESS} | sed 's/https:\\/\\///g' | sed 's/http:\\/\\///g')\n        if [ -z \"${USERNAME}\" ] && [ -z \"${ACCESS_TOKEN}\" ]; then\n            git clone https://${MODIFIED_GIT_REPO} .\n        else\n            git clone https://${USERNAME}:${ACCESS_TOKEN}@${MODIFIED_GIT_REPO} .\n        fi\n    else\n        echo \"✓ Fichiers utilisateur détectés\"\n    fi\nelse\n    echo \"Mode: Clonage depuis GitHub\"\n    MODIFIED_GIT_REPO=$(echo ${GIT_ADDRESS} | sed 's/https:\\/\\///g' | sed 's/http:\\/\\///g')\n    \n    if [ -d .git ]; then\n        echo \"Dépôt Git existant détecté, mise à jour...\"\n        git pull\n    else\n        echo \"Clonage du dépôt...\"\n        if [ -z \"${USERNAME}\" ] && [ -z \"${ACCESS_TOKEN}\" ]; then\n            git clone https://${MODIFIED_GIT_REPO} .\n        else\n            git clone https://${USERNAME}:${ACCESS_TOKEN}@${MODIFIED_GIT_REPO} .\n        fi\n    fi\nfi\n\necho \"✓ Code source récupéré\"\n\n# Vérifier la présence de Cargo.toml\nif [ ! -f Cargo.toml ]; then\n    echo \"✗ ERREUR: Cargo.toml introuvable!\"\n    echo \"Le dépôt ne semble pas être un projet Rust valide.\"\n    exit 1\nfi\n\necho \"\"\necho \"[4/5] Configuration de l'environnement Rust...\"\n\n# S'assurer que Rust est dans le PATH\nexport PATH=\"$HOME/.cargo/bin:$PATH\"\nsource \"$HOME/.cargo/env\" 2>/dev/null || true\n\n# Créer le fichier .cargo/env pour le runtime\nmkdir -p $HOME/.cargo\ncat > $HOME/.cargo/env << 'EOF'\nexport PATH=\"$HOME/.cargo/bin:$PATH\"\nEOF\n\necho \"✓ Environnement configuré\"\n\n# Compilation du projet\necho \"\"\necho \"[5/5] Compilation du projet Rust...\"\necho \"⚠ Cette étape peut prendre 5-10 minutes, soyez patient...\"\n\n# Compiler en mode release\nif cargo build --release; then\n    echo \"\"\n    echo \"═══════════════════════════════════════════════════════════\"\n    echo \"  ✓ Compilation réussie!\"\n    echo \"═══════════════════════════════════════════════════════════\"\n    \n    # Vérifier que le binaire existe\n    if [ -f target/release/discord-music-bot ]; then\n        echo \"✓ Binaire créé: target/release/discord-music-bot\"\n        ls -lh target/release/discord-music-bot\n    else\n        echo \"⚠ Attention: Le binaire n'a pas été trouvé à l'emplacement attendu\"\n        echo \"Recherche du binaire...\"\n        find target/release -type f -executable -ls\n    fi\nelse\n    echo \"\"\n    echo \"═══════════════════════════════════════════════════════════\"\n    echo \"  ✗ ERREUR DE COMPILATION\"\n    echo \"═══════════════════════════════════════════════════════════\"\n    echo \"\"\n    echo \"La compilation a échoué. Causes possibles:\"\n    echo \"  - Mémoire insuffisante (minimum 1 GB requis)\"\n    echo \"  - Dépendances manquantes\"\n    echo \"  - Erreur dans le code source\"\n    echo \"\"\n    echo \"Solutions:\"\n    echo \"  1. Augmentez la RAM allouée au serveur (minimum 2 GB)\"\n    echo \"  2. Vérifiez les logs ci-dessus pour plus de détails\"\n    echo \"  3. Réessayez l'installation\"\n    echo \"\"\n    exit 1\nfi\n\necho \"\"\necho \"═══════════════════════════════════════════════════════════\"\necho \"  ✓ Installation terminée avec succès!\"\necho \"═══════════════════════════════════════════════════════════\"\necho \"\"\necho \"Prochaines étapes:\"\necho \"  1. Configurez votre DISCORD_BOT_TOKEN dans l'onglet Startup\"\necho \"  2. Démarrez le serveur\"\necho \"  3. Le bot se connectera automatiquement à Discord\"\necho \"\"\necho \"Informations:\"\necho \"  - FFmpeg: $(ffmpeg -version 2>&1 | head -n1)\"\necho \"  - yt-dlp: $(yt-dlp --version 2>&1)\"\necho \"  - Rust: $(rustc --version)\"\necho \"\"\necho \"═══════════════════════════════════════════════════════════\"\n",
+            "container": "ghcr.io/parkervcp/installers:debian",
             "entrypoint": "bash"
         }
     },
     "variables": [
         {
             "name": "Discord Bot Token",
-            "description": "Le token de votre bot Discord. Obtenez-le sur https:\/\/discord.com\/developers\/applications",
+            "description": "Le token de votre bot Discord. Obtenez-le sur https://discord.com/developers/applications",
             "env_variable": "DISCORD_BOT_TOKEN",
             "default_value": "",
             "user_viewable": true,
@@ -42,9 +42,9 @@
         },
         {
             "name": "Git Repository Address",
-            "description": "Adresse du dépôt GitHub (sans https:\/\/)",
+            "description": "Adresse du dépôt GitHub (sans https://)",
             "env_variable": "GIT_ADDRESS",
-            "default_value": "github.com\/LHRICO78\/discord-music-bot-rust.git",
+            "default_value": "github.com/LHRICO78/discord-music-bot-rust.git",
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string",
@@ -82,7 +82,7 @@
         },
         {
             "name": "User Upload",
-            "description": "Ignorer le clonage Git et utiliser les fichiers uploadés (true\/false)",
+            "description": "Ignorer le clonage Git et utiliser les fichiers uploadés (true/false)",
             "env_variable": "USER_UPLOAD",
             "default_value": "false",
             "user_viewable": true,
