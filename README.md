@@ -23,6 +23,8 @@ Un bot Discord avancé écrit en **Rust** pour lire de la musique YouTube dans l
 
 ## 🚀 Installation
 
+> **🦖 Pour déployer sur Pterodactyl Panel, consultez le [Guide Pterodactyl](PTERODACTYL.md)**
+
 ### 1. Cloner le dépôt
 
 ```bash

@@ -1,0 +1,105 @@
+{
+    "_comment": "Discord Music Bot Rust - Pterodactyl Egg",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2025-10-18T00:00:00+00:00",
+    "name": "Discord Music Bot (Rust)",
+    "author": "discord@bot.com",
+    "description": "Un bot Discord haute performance écrit en Rust pour lire de la musique YouTube dans les salons vocaux avec interface interactive.",
+    "features": [
+        "eula"
+    ],
+    "docker_images": {
+        "ghcr.io/parkervcp/yolks:rust_1.90": "ghcr.io/parkervcp/yolks:rust_1.90"
+    },
+    "file_denylist": [],
+    "startup": "if [[ -d .git ]] && [[ {{AUTO_UPDATE}} == \"1\" ]]; then git pull; fi; if [[ ! -f /usr/local/bin/ffmpeg ]]; then echo \"Installation de FFmpeg...\"; apt update && apt install -y ffmpeg yt-dlp; fi; cargo build --release && ./target/release/discord-music-bot",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"est connect\\u00e9 et pr\\u00eat\"\r\n}",
+        "logs": "{}",
+        "stop": "^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\n# Discord Music Bot Rust Installation Script\r\n\r\napt update\r\napt install -y git curl wget ffmpeg yt-dlp pkg-config libssl-dev\r\n\r\ncd \/mnt\/server\r\n\r\nif [ \"${USER_UPLOAD}\" == \"true\" ] || [ \"${USER_UPLOAD}\" == \"1\" ]; then\r\n    echo -e \"Assuming user uploaded files...\"\r\n    if [ ! -f Cargo.toml ]; then\r\n        echo -e \"Cargo.toml not found, cloning from GitHub...\"\r\n        MODIFIED_GIT_REPO=$(echo ${GIT_ADDRESS} | sed 's\/https:\\\/\\\/\/\/g' | sed 's\/http:\\\/\\\/\/\/g')\r\n        if [ -z \"${USERNAME}\" ] && [ -z \"${ACCESS_TOKEN}\" ]; then\r\n            echo -e \"Cloning without credentials\"\r\n            git clone https:\/\/${MODIFIED_GIT_REPO} .\r\n        else\r\n            echo -e \"Cloning with credentials\"\r\n            git clone https:\/\/${USERNAME}:${ACCESS_TOKEN}@${MODIFIED_GIT_REPO} .\r\n        fi\r\n    fi\r\nelse\r\n    echo -e \"Cloning from GitHub repository...\"\r\n    MODIFIED_GIT_REPO=$(echo ${GIT_ADDRESS} | sed 's\/https:\\\/\\\/\/\/g' | sed 's\/http:\\\/\\\/\/\/g')\r\n    if [ -z \"${USERNAME}\" ] && [ -z \"${ACCESS_TOKEN}\" ]; then\r\n        echo -e \"Cloning without credentials\"\r\n        git clone https:\/\/${MODIFIED_GIT_REPO} .\r\n    else\r\n        echo -e \"Cloning with credentials\"\r\n        git clone https:\/\/${USERNAME}:${ACCESS_TOKEN}@${MODIFIED_GIT_REPO} .\r\n    fi\r\nfi\r\n\r\nif [ -f Cargo.toml ]; then\r\n    echo -e \"Compiling Rust project...\"\r\n    cargo build --release\r\n    echo -e \"Compilation completed successfully!\"\r\nelse\r\n    echo -e \"Cargo.toml not found, skipping compilation\"\r\nfi\r\n\r\necho -e \"Installation complete!\"\r\necho -e \"Don't forget to set your DISCORD_BOT_TOKEN in the Startup tab!\"",
+            "container": "ghcr.io\/parkervcp\/installers:debian",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Discord Bot Token",
+            "description": "Le token de votre bot Discord. Obtenez-le sur https:\/\/discord.com\/developers\/applications",
+            "env_variable": "DISCORD_BOT_TOKEN",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Repository Address",
+            "description": "Adresse du dépôt GitHub (sans https:\/\/)",
+            "env_variable": "GIT_ADDRESS",
+            "default_value": "github.com\/LHRICO78\/discord-music-bot-rust.git",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Username",
+            "description": "Nom d'utilisateur GitHub (optionnel, pour les dépôts privés)",
+            "env_variable": "USERNAME",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Access Token",
+            "description": "Token d'accès GitHub (optionnel, pour les dépôts privés)",
+            "env_variable": "ACCESS_TOKEN",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Auto Update",
+            "description": "Mettre à jour automatiquement depuis GitHub au démarrage (1 = oui, 0 = non)",
+            "env_variable": "AUTO_UPDATE",
+            "default_value": "1",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "User Upload",
+            "description": "Ignorer le clonage Git et utiliser les fichiers uploadés (true\/false)",
+            "env_variable": "USER_UPLOAD",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "Rust Log Level",
+            "description": "Niveau de log Rust (trace, debug, info, warn, error)",
+            "env_variable": "RUST_LOG",
+            "default_value": "info",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:trace,debug,info,warn,error",
+            "field_type": "text"
+        }
+    ]
+}
+
